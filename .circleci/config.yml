@@ -12,7 +12,7 @@ commands:
           name: Destroy environments
           when: on_fail
           command: |
-            aws s3 rm s3://udapeople-fredudacity/ --recursive
+            aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}/ --recursive
             aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
             aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
 
@@ -155,7 +155,6 @@ jobs:
               --tags project=udapeople \
               --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" 
-              
       - run:
           name: Add back-end ip to ansible inventory
           command: |
@@ -165,14 +164,11 @@ jobs:
             --output text >> .circleci/ansible/inventory.txt
 
             cat ./.circleci/ansible/inventory.txt
-      
-      - destroy-environment
-
       - persist_to_workspace:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-      # Here's where you will add some code to rollback on failure      
+      - destroy-environment
 
   configure-infrastructure:
     docker:
@@ -201,11 +197,8 @@ jobs:
           command: |
             cd .circleci/ansible/
             ansible-playbook -i inventory.txt configure-server.yml
-
       - destroy-environment
           
-      # Here's where you will add some code to rollback on failure      
-
   # run-migrations:
   #   docker:
   #     # Docker image here that supports NodeJS
