@@ -308,7 +308,7 @@ jobs:
             tar -C backend -czvf artifact.tar.gz .
             ls -la
       - run:
-          name: Deploy backend
+          name: Deploy backend 
           command: |
             ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/deploy-backend.yml
       - revert-migrations
