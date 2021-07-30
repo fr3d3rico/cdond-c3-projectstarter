@@ -10,7 +10,7 @@ commands:
     steps:
       - run:
           name: Destroy environments
-          # when: on_fail
+          when: on_fail
           command: |
             aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}/ --recursive
             aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
@@ -25,7 +25,7 @@ commands:
     steps:
       - run:
           name: Revert migrations
-          # when: on_fail
+          when: on_fail
           command: |
             SUCCESS=$(curl -H "token: b614fca1-86e7-4215-b1af-6fd45ce24223" --request GET https://api.memstash.io/values/migrations_${CIRCLE_WORKFLOW_ID:0:7})
             if(( $SUCCESS==1 )); 
@@ -235,45 +235,84 @@ jobs:
             echo "${SUCCESS}"
       - revert-migrations
       - destroy-environment
-     # Here's where you will add some code to rollback on failure      
 
-  # deploy-frontend:
-  #   docker:
-  #     # Docker image here that supports AWS CLI
-  #   steps:
-  #     # Checkout code from git
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           # your code here
-  #     - run:
-  #         name: Get backend url
-  #         command: |
-  #           # your code here
-  #           export API_URL="http://${BACKEND_IP}:3030"
-  #           echo "${API_URL}"
-  #     - run:
-  #         name: Deploy frontend objects
-  #         command: |
-  #           # your code here
-      # Here's where you will add some code to rollback on failure      
+  deploy-frontend:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            curl -sL https://rpm.nodesource.com/setup_lts.x | bash 
+            yum -y install nodejs
+            yum -y install tar gzip
+      - run:
+          name: Get backend url
+          command: |
+            BACKEND_IP=$(curl -H "token: b614fca1-86e7-4215-b1af-6fd45ce24223" --request GET https://api.memstash.io/values/url_${CIRCLE_WORKFLOW_ID:0:7})
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo API_URL="http://${BACKEND_IP}:3030" >> "frontend/.env"
+            echo '****************** API_URL'
+            echo "${API_URL}"
+      - run:
+          name: Deploy frontend objects
+          command: |
+            npm install webpack-dev-server -g
+            cd frontend
+            npm i
+            npm run build
+            aws s3 cp ./dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+      - revert-migrations
+      - destroy-environment
                     
-  # deploy-backend:
-  #   docker:
-  #     # Docker image here that supports Ansible
-  #   steps:
-  #     # Checkout code from git
-  #     # Add ssh keys with fingerprint
-  #     # attach workspace
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           # your code here
-  #     - run:
-  #         name: Deploy backend
-  #         command: |
-  #           # your code here
-      # Here's where you will add some code to rollback on failure  
+  deploy-backend:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["41:e8:61:5b:75:ae:e1:30:53:3e:ec:cb:50:36:48:ee"]
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update ansible
+            apk add --update tar gzip curl
+            apk add --update openssh-client
+      - run:
+          name: Setup inventory file
+          command: |
+            cd .circleci/ansible
+            echo "[web]" >> inventory.txt
+            URLS=$(curl -H "token: b614fca1-86e7-4215-b1af-6fd45ce24223" --request GET https://api.memstash.io/values/url_${CIRCLE_WORKFLOW_ID:0:7})
+            echo $URLS >> inventory.txt
+            cat inventory.txt
+      - run:
+          name: add values to env files to EC2
+          command: |
+            echo ENVIROMENT=production >> "backend/.env"
+            echo TYPEORM_CONNECTION=postgres >> "backend/.env"
+            echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
+            echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "backend/.env"
+            echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> "backend/.env"
+            echo TYPEORM_HOST=$TYPEORM_HOST >> "backend/.env"
+            echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/.env"
+            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
+            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"
+            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"
+      - run:
+          name: Compress Backend
+          command: |
+            tar -C backend -czvf artifact.tar.gz .
+            ls -la
+      - run:
+          name: Deploy backend
+          command: |
+            ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/deploy-backend.yml
+      - revert-migrations
+      - destroy-environment
 
   # smoke-test:
   #   docker:
@@ -355,10 +394,10 @@ workflows:
           requires: [deploy-infrastructure]
       - run-migrations:
           requires: [configure-infrastructure]
-      # - deploy-frontend:
-      #     requires: [run-migrations]
-      # - deploy-backend:
-      #     requires: [run-migrations]
+      - deploy-frontend:
+          requires: [run-migrations]
+      - deploy-backend:
+          requires: [run-migrations]
       # - smoke-test:
       #     requires: [deploy-backend, deploy-frontend]
       # - cloudfront-update:
