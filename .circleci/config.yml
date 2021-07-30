@@ -211,6 +211,11 @@ jobs:
       - restore_cache:
           keys: [backend-build]
       - run:
+          name: Install dependencies
+          command: |
+            apk add --update tar gzip ansible nodejs npm curl
+            pip install awscli
+      - run:
           name: Run migrations
           command: |
             cd backend
@@ -271,6 +276,8 @@ jobs:
       - image: python:3.7-alpine3.11
     steps:
       - checkout
+      - restore_cache:
+          keys: [backend-build]
       - add_ssh_keys:
           fingerprints: ["41:e8:61:5b:75:ae:e1:30:53:3e:ec:cb:50:36:48:ee"]
       - attach_workspace:
@@ -281,6 +288,7 @@ jobs:
             apk add --update ansible
             apk add --update tar gzip curl
             apk add --update openssh-client
+            pip install awscli
       - run:
           name: Setup inventory file
           command: |
