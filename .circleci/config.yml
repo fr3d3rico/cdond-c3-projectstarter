@@ -4,14 +4,17 @@ commands:
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
-      # Add parameter here   
+      workflow-id:
+        type: string  
+        default: ${CIRCLE_WORKFLOW_ID:0:7}
     steps:
       - run:
           name: Destroy environments
           when: on_fail
           command: |
-            # Your code here
-            exit 1
+            aws s3 rm s3://udapeople-fredudacity/ --recursive
+            aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+            aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
 
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
@@ -22,14 +25,12 @@ commands:
           name: Revert migrations
           # Add when this will run
           command: |
-            # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS = 1
+            SUCCESS=$(curl -H "token: b614fca1-86e7-4215-b1af-6fd45ce24223" --request GET https://api.memstash.io/values/migrations_${CIRCLE_WORKFLOW_ID:0:7})
             if(( $SUCCESS==1 )); 
             then
-            #  cd ~/project/backend
-            #  npm install
-            #  Add revert code here. You can find this in the Getting Started section.
-              exit 1
+              cd ~/project/backend
+              npm install
+              npm run migrations:revert
             fi
             
 jobs:
@@ -46,7 +47,6 @@ jobs:
             cd frontend
             npm i
             npm run build
-            # exit 1
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
@@ -146,7 +146,7 @@ jobs:
               
               URLS=$(aws ec2 describe-instances --region us-west-2 --query "Reservations[*].Instances[*].PublicIpAddress"  --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}"  --output text)
               echo "URLS=$URLS"
-              curl -H "Content-Type: text/plain" -H "token: XXXXX" --request PUT --data "$URLS" https://api.memstash.io/values/url_${CIRCLE_WORKFLOW_ID:0:7}
+              curl -H "Content-Type: text/plain" -H "token: b614fca1-86e7-4215-b1af-6fd45ce24223" --request PUT --data "$URLS" https://api.memstash.io/values/url_${CIRCLE_WORKFLOW_ID:0:7}
       - run:
           name: Ensure front-end infrastructure exist
           command: |
@@ -165,6 +165,7 @@ jobs:
             --output text >> .circleci/ansible/inventory.txt
 
             cat ./.circleci/ansible/inventory.txt
+
       - persist_to_workspace:
           root: ~/
           paths:
