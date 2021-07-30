@@ -239,7 +239,7 @@ jobs:
             echo '*****************'
             echo "${SUCCESS}"
       - revert-migrations
-      - destroy-environment
+      # - destroy-environment
 
   deploy-frontend:
     docker:
