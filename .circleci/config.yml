@@ -214,7 +214,7 @@ jobs:
           name: Install dependencies
           command: |
             apk add --update tar gzip ansible nodejs npm curl
-            pip install awscli
+          # pip install awscli
       - run:
           name: Run migrations
           command: |
