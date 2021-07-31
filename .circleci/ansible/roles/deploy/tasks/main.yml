@@ -40,6 +40,6 @@
     
 - name: start pm2 for dist/main.js
   become: no
-  shell: pm2 start main.js
+  shell: pm2 start main.js -f
   args:
     chdir: /home/ubuntu/backend/dist
