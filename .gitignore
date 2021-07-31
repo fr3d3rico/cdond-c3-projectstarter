@@ -70,3 +70,5 @@ node_modules
 dist
 
 lesson5-task16.pem
+fred.sh
+.circle/ansible/lesson5-task16.pem
