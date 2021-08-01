@@ -82,7 +82,7 @@ jobs:
           name: Test Front-end
           command: |
             cd frontend
-          # npm run test  #comment for fast execution
+            npm run test
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
@@ -98,7 +98,7 @@ jobs:
           name: Test Back-end
           command: |
             cd backend
-          #  npm run test #comment for fast execution
+            npm run test
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
@@ -353,11 +353,9 @@ jobs:
             URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/index.html#/employees"
             if curl -s ${URL} | grep "Welcome"
             then
-              echo 'THEN *****************'
               return 0
             else
-              echo 'ELSE *****************'
-              return 0
+              return 1
             fi
       - destroy-environment
       - revert-migrations
@@ -404,8 +402,8 @@ jobs:
               if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
               then
                 aws s3 rm s3://udapeople-${OldWorkflowID}/ --recursive
-                aws cloudformation delete-stack --stack-name "udapeople-backend--${OldWorkflowID}"
-                aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
+                aws cloudformation delete-stack --stack-name udapeople-backend-${OldWorkflowID}
+                aws cloudformation delete-stack --stack-name udapeople-frontend-${OldWorkflowID}
               fi
             
 
