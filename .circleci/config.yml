@@ -382,7 +382,7 @@ jobs:
               list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
               --no-paginate --output text)
             
-            curl -H "Content-Type: text/plain" -H "token: b614fca1-86e7-4215-b1af-6fd45ce24223" --request PUT --data "0" https://api.memstash.io/values/OldWorkflowID_${OldWorkflowID}
+            curl -H "Content-Type: text/plain" -H "token: b614fca1-86e7-4215-b1af-6fd45ce24223" --request PUT --data "$OldWorkflowID" https://api.memstash.io/values/OldWorkflowID
 
             aws cloudformation update-stack \
             --stack-name udapeople-cloudfront \
@@ -405,7 +405,7 @@ jobs:
               # list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
               # --no-paginate --output text)
               
-              OldWorkflowID=$(curl -H "token: b614fca1-86e7-4215-b1af-6fd45ce24223" --request GET https://api.memstash.io/values/OldWorkflowID_${OldWorkflowID})
+              OldWorkflowID=$(curl -H "token: b614fca1-86e7-4215-b1af-6fd45ce24223" --request GET https://api.memstash.io/values/OldWorkflowID)
 
               STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
               --stack-status-filter CREATE_COMPLETE --no-paginate --output text))
@@ -420,7 +420,7 @@ jobs:
                 aws cloudformation delete-stack --stack-name udapeople-backend-${OldWorkflowID}
                 aws cloudformation delete-stack --stack-name udapeople-frontend-${OldWorkflowID}
 
-                aws ssm put-parameter --overwrite --name "WorkflowID" --type "String" --value "${CIRCLE_WORKFLOW_ID:0:7}"
+                # aws ssm put-parameter --overwrite --name "WorkflowID" --type "String" --value "${CIRCLE_WORKFLOW_ID:0:7}"
               fi
 
 workflows:
