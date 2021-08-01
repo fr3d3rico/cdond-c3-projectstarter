@@ -350,11 +350,13 @@ jobs:
       - run:
           name: Frontend smoke test.
           command: |
-            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-us-east-1.amazonaws.com/index.html#/employees"
+            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/index.html#/employees"
             if curl -s ${URL} | grep "Welcome"
             then
+              echo "THEN *****************""
               return 0
             else
+              echo "ELSE *****************"
               return 0
             fi
       - destroy-environment
