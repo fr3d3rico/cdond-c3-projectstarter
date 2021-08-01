@@ -192,7 +192,7 @@ jobs:
           name: Setup inventory file
           command: |
             cd .circleci/ansible
-            echo "[web]" >> inventory.txt
+            echo "[web]" > inventory.txt
             URLS=$(curl -H "token: b614fca1-86e7-4215-b1af-6fd45ce24223" --request GET https://api.memstash.io/values/url_${CIRCLE_WORKFLOW_ID:0:7})
             echo $URLS >> inventory.txt
             cat inventory.txt
@@ -293,7 +293,7 @@ jobs:
           name: Setup inventory file
           command: |
             cd .circleci/ansible
-            echo "[web]" >> inventory.txt
+            echo "[web]" > inventory.txt
             URLS=$(curl -H "token: b614fca1-86e7-4215-b1af-6fd45ce24223" --request GET https://api.memstash.io/values/url_${CIRCLE_WORKFLOW_ID:0:7})
             echo $URLS >> inventory.txt
             cat inventory.txt
