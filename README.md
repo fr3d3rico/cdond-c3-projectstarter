@@ -57,3 +57,6 @@ Before you submit your project, please check your work against the project rubri
 ### License
 
 [License](LICENSE.md)
+
+
+aws cloudformation --profile devops deploy --template-file .\.circleci\files\cloudfront.yml --parameter-overrides WorkflowID=fredudacity --stack-name "cloudfront-udacity-project"
