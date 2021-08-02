@@ -407,26 +407,30 @@ jobs:
               # list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
               # --no-paginate --output text)
               
-              OldWorkflowID=$(curl -H "token: b614fca1-86e7-4215-b1af-6fd45ce24223" --request GET https://api.memstash.io/values/OldWorkflowID)
+              # OldWorkflowID=$(curl -H "token: b614fca1-86e7-4215-b1af-6fd45ce24223" --request GET https://api.memstash.io/values/OldWorkflowID)
 
               STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
               --stack-status-filter CREATE_COMPLETE --no-paginate --output text))
 
-              echo "${OldWorkflowID}"
+              # echo "${OldWorkflowID}"
         - run:
             name: Remove old stacks and files
             command: |
-              echo Old Workflow Id: "${OldWorkflowID}"
+              OldWorkflowID=$(curl -H "token: b614fca1-86e7-4215-b1af-6fd45ce24223" --request GET https://api.memstash.io/values/OldWorkflowID)
+              
+              echo OldWorkflowID: "${OldWorkflowID}"
+              
               if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
               then
-                # aws s3 rm s3://udapeople-${OldWorkflowID:0:7}/ --recursive
-                aws s3 rb s3://udapeople-${OldWorkflowID:0:7} --force
-                aws cloudformation delete-stack --stack-name udapeople-backend-${OldWorkflowID:0:7}
-                aws cloudformation delete-stack --stack-name udapeople-frontend-${OldWorkflowID:0:7}
+                # aws s3 rm s3://udapeople-${OldWorkflowID}/ --recursive
+                aws s3 rb s3://udapeople-${OldWorkflowID} --force
+                aws cloudformation delete-stack --stack-name udapeople-backend-${OldWorkflowID}
+                aws cloudformation delete-stack --stack-name udapeople-frontend-${OldWorkflowID}
 
                 # aws ssm put-parameter --overwrite --name "WorkflowID" --type "String" --value "${CIRCLE_WORKFLOW_ID:0:7}"
               else
-                echo "no destroy"
+                echo "Destroy not performed"
+                # aws ssm put-parameter --overwrite --name "WorkflowID" --type "String" --value "${OldWorkflowID}"
                 return 1
               fi
         - destroy-environment
