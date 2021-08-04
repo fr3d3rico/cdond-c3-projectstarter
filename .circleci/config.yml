@@ -263,6 +263,9 @@ jobs:
       - run:
           name: Deploy frontend objects
           command: |
+            BACKEND_IP=$(curl -H "token: b614fca1-86e7-4215-b1af-6fd45ce24223" --request GET https://api.memstash.io/values/url_${CIRCLE_WORKFLOW_ID:0:7})
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo API_URL="http://${BACKEND_IP}:3030" >> "frontend/.env"
             npm install webpack-dev-server -g
             cd frontend
             npm i
