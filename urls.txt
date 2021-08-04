@@ -1,10 +1,10 @@
 [URL01]
 https://github.com/fr3d3rico/cdond-c3-projectstarter
 [URL02]
-http://udapeople-2e40f4c.s3-website-us-east-1.amazonaws.com
+http://udapeople-2e429da.s3-website-us-east-1.amazonaws.com
 [URL03]
 d1ylw8k81e5hzs.cloudfront.net
 [URL04]
-ec2-54-167-48-163.compute-1.amazonaws.com
+ec2-35-175-104-98.compute-1.amazonaws.com
 [URL05]
-http://ec2-50-17-153-93.compute-1.amazonaws.com:9090/
+http://ec2-3-234-254-122.compute-1.amazonaws.com:9090/
