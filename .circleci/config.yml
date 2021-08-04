@@ -81,7 +81,7 @@ jobs:
           name: Test Front-end
           command: |
             cd frontend
-          # npm run test
+            # npm run test
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
@@ -97,7 +97,7 @@ jobs:
           name: Test Back-end
           command: |
             cd backend
-          # npm run test
+            # npm run test
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
@@ -113,7 +113,7 @@ jobs:
           name: Scan Front-end
           command: |
             cd frontend
-          # npm i
+            # npm i
             npm audit fix --audit-level=critical --force
 
   scan-backend:
@@ -127,7 +127,7 @@ jobs:
           name: Scan Back-end
           command: |
             cd backend
-          # npm i
+            # npm i
             npm audit fix --audit-level=critical --force
 
   deploy-infrastructure:
