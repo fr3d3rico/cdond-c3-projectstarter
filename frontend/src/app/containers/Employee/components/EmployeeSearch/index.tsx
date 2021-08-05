@@ -145,7 +145,7 @@ export class Employees extends React.Component<
     ];
   }
 
-  handleSearch = (searchText: string) => {};
+  handleSearch = (searchText: string) => { };
 
   handleTableFilter = (filterText: string) => {
     this.props.actions.fetchEmployees(filterText);
@@ -205,7 +205,7 @@ export class Employees extends React.Component<
         <SearchBar searchInput={generalSearch} />
         <div className={`${style['g-sectionbar']} ${style['grid-x']}`}>
           <Breadcrumb
-            rootPathName='View & Manage Employees'
+            rootPathName='View & Manage Employees Fred'
             isSecondaryPage={false}
           >
             <li>
