@@ -27,10 +27,12 @@ Resources:
         Enabled: True
         DefaultRootObject: index.html
         DefaultCacheBehavior:
-          ForwardedValues:
-            QueryString: False
+          # ForwardedValues:
+          #   QueryString: False
           TargetOriginId: webpage
           ViewerProtocolPolicy: allow-all
+          CachePolicyId: "b4f8e523-9b76-41d2-b8c9-87be537b5d89" #"no-cache-for-udapeople" #https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudfront-distribution-cachebehavior.html
+
 
 Outputs:
   WorkflowID:

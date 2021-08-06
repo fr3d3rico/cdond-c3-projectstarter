@@ -59,4 +59,12 @@ Before you submit your project, please check your work against the project rubri
 [License](LICENSE.md)
 
 
-aws cloudformation --profile devops deploy --template-file .\.circleci\files\cloudfront.yml --parameter-overrides WorkflowID=fredudacity --stack-name "cloudfront-udacity-project"
+aws cloudformation --profile devops deploy --template-file .\.circleci\files\cloudfront.yml --parameter-overrides CachePolicyId=b4f8e523-9b76-41d2-b8c9-87be537b5d89 WorkflowIDTest=d41745b --stack-name "cloudfront-fred"
+
+aws cloudformation --profile devops deploy --template-file .\.circleci\files\cloudfront.yml --parameter-overrides WorkflowID=d41745b --stack-name "cloudfront-udacity-project"
+
+
+ aws cloudformation --profile devops update-stack --stack-name cloudfront-udacity-project --use-previous-template --parameters ParameterKey=WorkflowID,ParameterValue="d41745b" ParameterKey=CachePolicyId,ParameterValue=b4f8e523-9b76-41d2-b8c9-87be537b5d89
+
+ aws cloudformation --profile devops update-stack --stack-name cloudfront-udacity-project --template-file .\.circleci\files\cloudfront.yml --parameters ParameterKey=WorkflowID,ParameterValue="d41745b" ParameterKey=CachePolicyId,ParameterValue="b4f8e523-9b76-41d2-b8c9-87be537b5d89"
+
